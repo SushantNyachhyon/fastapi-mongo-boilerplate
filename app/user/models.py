@@ -17,7 +17,7 @@ class User(DocumentFactory):
     email: EmailStr
     password: str
     is_active: Optional[bool] = False
-    last_login: datetime | None = None
+    last_login: Optional[datetime] = None
 
     class Collection:
         name = 'users'

@@ -2,8 +2,8 @@
 application routes
 """
 from fastapi import APIRouter
-from app.authentication.api import route as _auth_routes
+from app.authentication.apis import route as _auth_routes
 
 router = APIRouter()
 
-router.include_router(_auth_routes, tags=['Authentication'])
+router.include_router(_auth_routes, prefix='/api/v1', tags=['Authentication'])

@@ -1,5 +1,6 @@
 """ jwt utilities """
 from datetime import datetime, timedelta
+from typing import Optional
 from fastapi import HTTPException
 from jose import jwt, JWTError
 
@@ -14,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 async def create_access_token(
     data: dict,
-    expiry_time: timedelta | None = None
+    expiry_time: Optional[timedelta] = None
 ) -> str:
     encode = data.copy()
     if expiry_time:

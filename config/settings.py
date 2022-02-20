@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     """
     APP_NAME: str = Field(..., env='APP_NAME')
     APP_DESCRIPTION: str = Field(..., env='APP_DESCRIPTION')
+    APP_VERSION: str = Field(..., env='APP_VERSION')
     APP_SECRET: str = Field(..., env='APP_SECRET')
     STATIC_URL: str = Field(..., env='STATIC_URL')
     STATIC_PATH: str = Field(..., env='STATIC_PATH')

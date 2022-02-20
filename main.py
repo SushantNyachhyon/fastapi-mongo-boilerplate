@@ -19,9 +19,9 @@ from routes import router
 settings = settings.get_settings()
 
 app = FastAPI(
-    title='Boilerplate',
-    version='1.0',
-    description='Boilerplate for FastAPI with Mongo',
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description=settings.APP_DESCRIPTION,
     docs_url=None,
     redoc_url=None
 )

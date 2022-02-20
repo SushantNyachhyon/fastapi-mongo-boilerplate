@@ -1,0 +1,14 @@
+fastapi
+typer
+starlette
+uvicorn[standard]
+beanie
+pydantic[email,dotenv]
+python-multipart
+passlib[bcrypt]
+python-jose[cryptography]
+aiofiles
+pylint
+pytest
+yapf
+neovim

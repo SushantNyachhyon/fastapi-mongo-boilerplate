@@ -9,12 +9,16 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 
 from core.security.jwt import create_access_token
 from core.security.hash import hash_string, verify_hash
-from app.user.models import User
-from app.user.schemas import UserInCreate
-from .schemas import Token
+
+from app.user.requests import UserRequest
+from app.user.responses import UserResponse
+from app.user.repository import get_user_repo
+from .responses import TokenResponse
+
+user_repo = get_user_repo()
 
 
-async def _check_if_user_exists(user: User) -> bool:
+async def _check_if_user_exists(user: UserResponse) -> bool:
     if not user:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -28,7 +32,7 @@ async def _check_if_user_exists(user: User) -> bool:
     return True
 
 
-async def _check_if_user_is_active(user: User) -> bool:
+async def _check_if_user_is_active(user: UserResponse) -> bool:
     if not user.is_active:
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -39,12 +43,10 @@ async def _check_if_user_is_active(user: User) -> bool:
                 }
             }
         )
+    return True
 
 
-async def _verify_password(
-    plain_password: str,
-    hashed_password: str
-) -> bool:
+async def _verify_password(plain_password: str, hashed_password: str) -> bool:
     if not await verify_hash(plain_password, hashed_password):
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -58,23 +60,24 @@ async def _verify_password(
     return True
 
 
-async def _authenticate(credentials: OAuth2PasswordRequestForm) -> User:
-    user = await User.find_one(User.email == credentials.username)
+async def _authenticate(credentials: OAuth2PasswordRequestForm) -> UserResponse:
+    user = await user_repo.find_by_email(credentials.username)
     await _check_if_user_exists(user)
     await _check_if_user_is_active(user)
     await _verify_password(credentials.password, user.password)
     return user
 
 
-async def login(credentials: OAuth2PasswordRequestForm):
+async def login(credentials: OAuth2PasswordRequestForm) -> TokenResponse:
     user = await _authenticate(credentials)
     access_token = await create_access_token(data={'id': str(user.id)})
-    return Token(access_token=access_token, token_type='Bearer')
+    return TokenResponse(access_token=access_token, token_type='Bearer')
 
 
-async def register(payload: UserInCreate = Body(...)):
+async def register(payload: UserRequest = Body(...)) -> TokenResponse:
     payload.password = await hash_string(payload.password)
-    user = User(**jsonable_encoder(payload))
-    await user.create()
+    user = await user_repo.create(
+        jsonable_encoder(payload)
+    )
     access_token = await create_access_token(data={'id': str(user.id)})
-    return Token(access_token=access_token, token_type='Bearer')
+    return TokenResponse(access_token=access_token, token_type='Bearer')

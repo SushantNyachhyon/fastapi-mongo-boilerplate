@@ -1,12 +1,12 @@
 """
-authentication schemas
+authentication responses
 """
 from pydantic import BaseModel, Field
 
 
-class Token(BaseModel):
+class TokenResponse(BaseModel):
     """
-    token schema class
+    token response class
     """
     access_token: str = Field(...)
     token_type: str = Field(...)

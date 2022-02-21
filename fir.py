@@ -78,19 +78,45 @@ def createmodule(name: str):
 
 
 @app.command()
-def gensecret():
+def generatesecret():
     hex_key = _generate_hex()
     with open('.env', mode='r', encoding='utf-8') as f:
         with open('.env.temp', mode='w', encoding='utf-8') as temp:
             pattern = re.compile('APP_SECRET.+')
             for line in f.readlines():
                 if pattern.match(line):
-                    line = pattern.sub('APP_SECRET='+hex_key, line)
+                    line = pattern.sub(f'APP_SECRET={hex_key}', line)
                 temp.write(line)
             temp.close()
         f.close()
         os.rename('.env.temp', '.env')
     typer.echo(typer.style(hex_key, fg=typer.colors.GREEN))
+
+
+@app.command()
+def configapp(
+    name: str = typer.Option(..., prompt=True),
+    description: str = typer.Option(..., prompt=True)
+):
+    with open('.env', mode='r', encoding='utf-8') as f:
+        with open('.env.temp', mode='w', encoding='utf-8') as temp:
+            name_pattern = re.compile('APP_NAME.+')
+            desc_pattern = re.compile('APP_DESCRIPTION.+')
+            for line in f.readlines():
+                if name_pattern.match(line):
+                    line = name_pattern.sub(f'APP_NAME={name}', line)
+                if desc_pattern.match(line):
+                    line = desc_pattern.sub(
+                            f'APP_DESCRIPTION={description}',
+                            line
+                        )
+                temp.write(line)
+            temp.close()
+        f.close()
+        os.rename('.env.temp', '.env')
+    typer.echo(
+        typer.style('App config set successfully', fg=typer.colors.GREEN)
+    )
 
 
 if __name__ == '__main__':

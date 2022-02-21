@@ -2,6 +2,7 @@
 commands for scafolding project structure
 """
 import os
+import re
 from secrets import token_hex
 import typer
 
@@ -18,6 +19,7 @@ def _create_or_get_storage_path(path: str) -> None:
 def _write(path: str, content: str) -> None:
     with open(path, mode='w', encoding='utf-8') as f:
         f.write(content)
+        f.close()
 
 
 def _api_content(name: str):
@@ -77,7 +79,18 @@ def createmodule(name: str):
 
 @app.command()
 def gensecret():
-    typer.echo(typer.style(_generate_hex(), fg=typer.colors.GREEN))
+    hex_key = _generate_hex()
+    with open('.env', mode='r', encoding='utf-8') as f:
+        with open('.env.temp', mode='w', encoding='utf-8') as temp:
+            pattern = re.compile('APP_SECRET.+')
+            for line in f.readlines():
+                if pattern.match(line):
+                    line = pattern.sub('APP_SECRET='+hex_key, line)
+                temp.write(line)
+            temp.close()
+        f.close()
+        os.rename('.env.temp', '.env')
+    typer.echo(typer.style(hex_key, fg=typer.colors.GREEN))
 
 
 if __name__ == '__main__':

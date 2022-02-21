@@ -123,18 +123,25 @@ def generatesecret():
 @app.command()
 def configapp(
     name: str = typer.Option(..., prompt=True),
-    description: str = typer.Option(..., prompt=True)
+    description: str = typer.Option(..., prompt=True),
+    version: str = typer.Option(..., prompt=True)
 ):
     with open('.env', mode='r', encoding='utf-8') as f:
         with open('.env.temp', mode='w', encoding='utf-8') as temp:
             name_pattern = re.compile('APP_NAME.+')
             desc_pattern = re.compile('APP_DESCRIPTION.+')
+            version_pattern = re.compile('APP_VERSION.+')
             for line in f.readlines():
                 if name_pattern.match(line):
                     line = name_pattern.sub(f'APP_NAME={name}', line)
                 if desc_pattern.match(line):
                     line = desc_pattern.sub(
                             f'APP_DESCRIPTION={description}',
+                            line
+                        )
+                if version_pattern.match(line):
+                    line = version_pattern.sub(
+                            f'APP_VERSION={version}',
                             line
                         )
                 temp.write(line)

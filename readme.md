@@ -38,10 +38,13 @@ remember to set mongo connection string and db name in the env
 
 ## Commands
 config app name, description and version
+
     python fir.py configapp
 
 generate token secret
+
     python fir.py generatesecret
 
 create app scafolding
+
     python fir.py createmodule <module_name>

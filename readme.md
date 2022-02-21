@@ -25,12 +25,23 @@ Boilerplate for fastapi and mongodb with amazing scafolding commandline tool
 
 ## Project setup
 
-* python3 -m venv venv
-* source /venv/bin/activate
-* pip install --upgrade pip
-* pip install -r dependencies.txt
-* cp .env.example .env
-* python fir.py generatesecret
-* python main.py
+    python3 -m venv venv
+    source /venv/bin/activate
+    pip install --upgrade pip
+    pip install -r dependencies.txt
+    cp .env.example .env
+    python fir.py generatesecret
+    python main.py
 
 remember to set mongo connection string and db name in the env
+
+
+## Commands
+config app name, description and version
+    python fir.py configapp
+
+generate token secret
+    python fir.py generatesecret
+
+create app scafolding
+    python fir.py createmodule <module_name>

@@ -45,11 +45,36 @@ def _model_content(name: str):
     return content
 
 
-def _schema_content(name: str):
-    content = f'"""\n{name} schemas\n"""\n'
+def _response_content(name: str):
+    content = f'"""\n{name} responses\n"""\n'
     content += 'from core.models import SchemaFactory\n\n\n'
     content += f'class {name.capitalize()}(SchemaFactory):\n'
-    content += f'    """\n    {name} schema class\n    """\n'
+    content += f'    """\n    {name} response class\n    """\n'
+    return content
+
+
+def _request_content(name: str):
+    content = f'"""\n{name} requests\n"""\n'
+    content += 'from core.models import BaseModel\n\n\n'
+    content += f'class {name.capitalize()}(BaseModel):\n'
+    content += f'    """\n    {name} request class\n    """\n'
+    return content
+
+
+def _repository_content(name: str):
+    content = f'"""\n{name} repository\n"""\n'
+    content += 'from abc import ABCMeta, abstractmethod\n\n'
+    content += f'from .models import {name.capitalize()}\n\n\n'
+    content += f'class {name.capitalize()}Abstract:\n'
+    content += '    __metaclass__ = ABCMeta\n\n'
+    content += '    @abstractmethod\n'
+    content += f'    async def find_by_id(self, {name}_id: str):\n'
+    content += '        pass\n\n\n'
+    content += f'class {name.capitalize()}Repository({name.capitalize()}Abstract):\n'
+    content += '    def __init__(self):\n'
+    content += f'        self.model = {name.capitalize()}\n\n'
+    content += f'    async def find_by_id(self, {name}_id: str):\n'
+    content += '        pass\n'
     return content
 
 
@@ -72,8 +97,10 @@ def createmodule(name: str):
     _write(f'{path}/__init__.py', '')
     _write(f'{path}/apis.py', _api_content(name))
     _write(f'{path}/models.py', _model_content(name))
-    _write(f'{path}/schemas.py', _schema_content(name))
+    _write(f'{path}/requests.py', _request_content(name))
+    _write(f'{path}/responses.py', _response_content(name))
     _write(f'{path}/controllers.py', _controller_content(name))
+    _write(f'{path}/repository.py', _repository_content(name))
     typer.echo(typer.style('Module created', fg=typer.colors.GREEN))
 
 

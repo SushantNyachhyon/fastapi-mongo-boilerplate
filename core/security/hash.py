@@ -1,7 +1,7 @@
 """ hashing utilities """
 from passlib.context import CryptContext
 
-PWD_CONTEXT = CryptContext(schemes=['bcrypt'], deprecated='auto')
+PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def hash_string(plain_text: str) -> str:

@@ -12,12 +12,12 @@ class User(DocumentFactory):
     """
     user document class
     """
+
     first_name: str
     last_name: str
     email: EmailStr
     password: str
+    is_admin: Optional[bool] = False
     is_active: Optional[bool] = False
     last_login: Optional[datetime] = None
-
-    class Collection:
-        name = 'users'
+    created: Optional[datetime] = None

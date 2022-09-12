@@ -2,37 +2,34 @@
 base model classes
 """
 from datetime import datetime
-from beanie import (
-    Document,
-    PydanticObjectId,
-    before_event,
-    Insert,
-    Replace
-)
 from pydantic import BaseModel, Field
-from typing import Optional
+from bson import ObjectId
 
 
-class DocumentFactory(Document):
-    """
-    base document class for creating collection
-    """
-    created: Optional[datetime] = None
-    updated: Optional[datetime] = None
+class PydanticObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
-    @before_event(Insert)
-    def add_created_date(self):
-        self.created = datetime.now()
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("invalid object id")
+        return ObjectId(v)
 
-    @before_event(Replace)
-    def add_updated_date(self):
-        self.updated = datetime.now()
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
 
 
-class SchemaFactory(BaseModel):
+class DocumentFactory(BaseModel):
     """
     base model class for defining schema
     """
-    id: PydanticObjectId = Field(None, alias='_id')
-    created: Optional[datetime] = None
-    updated: Optional[datetime] = None
+
+    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

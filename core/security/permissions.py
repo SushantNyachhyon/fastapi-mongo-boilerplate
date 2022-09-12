@@ -1,39 +1,22 @@
 """
 permissions and access
 """
-from fastapi import Depends, HTTPException
-from starlette.status import HTTP_401_UNAUTHORIZED
+from fastapi import Depends
 
-from app.user.models import User
 from .oauth import is_authenticated
+from config import init_database
+from utils.exceptions import forbidden, unauthorized
 
 
 async def is_active_user(verified_id: str = Depends(is_authenticated)):
-    user = await User.get(verified_id)
-    if not user.is_active:
-        raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED,
-            detail={
-                'unauthorized': {
-                    'type': 'forbidden',
-                    'msg': 'user is not active'
-                }
-            }
-        )
+    db = init_database()["users"]
+    user = await db.find_one({"_id": verified_id})
+    if not user["is_active"]:
+        raise unauthorized(identifier="user", msg="user is not active")
     return user
 
 
-async def is_admin(verified_id: str = Depends(is_authenticated)):
-    user = await User.get(verified_id)
-    if not user.is_admin:
-        raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED,
-            detail={
-                'unauthorized': {
-                    'type': 'forbidden',
-                    'msg': 'you donot have sufficient permission'
-                }
-            }
-        )
+async def is_admin(user: dict = Depends(is_active_user)):
+    if not user["is_admin"]:
+        raise forbidden(identifier="user")
     return user
-

@@ -1,8 +1,7 @@
 fastapi
-typer
 starlette
 uvicorn[standard]
-beanie
+motor
 pydantic[email,dotenv]
 python-multipart
 passlib[bcrypt]
@@ -10,5 +9,4 @@ python-jose[cryptography]
 aiofiles
 pylint
 pytest
-yapf
-neovim
+black

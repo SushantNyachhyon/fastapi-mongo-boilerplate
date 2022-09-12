@@ -1,21 +1,18 @@
 """
 database connection configuration
 """
-from beanie import init_beanie
-from motor.motor_asyncio import AsyncIOMotorClient
-
-from app.user.models import User
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from .settings import get_settings
 
 settings = get_settings()
 
+database_pool = None
 
-async def init_database() -> None:
-    client = AsyncIOMotorClient(settings.DB_CON_STRING)
-    await init_beanie(
-        database=client[settings.DB_NAME],
-        document_models=[
-            User
-        ]
-    )
+
+def init_database() -> AsyncIOMotorDatabase:
+    global database_pool
+    if database_pool is None:
+        client = AsyncIOMotorClient(settings.DB_CON_STRING)
+        database_pool = client[settings.DB_NAME]
+    return database_pool
